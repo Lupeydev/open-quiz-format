@@ -14,7 +14,6 @@ An OQF File header consists of the following line
 
 ```oqf
 **OQF*
-
 ```
 
 ### Questions & Answers
@@ -22,13 +21,15 @@ An OQF File header consists of the following line
 Questions and answers are formatted with the following syntax:
 
 ```oqf
-:Question (can include :, !, ;, and =)
+:Question
 !Incorrect answers are marked with a ! and not a =
 =Correct answers are marked with a = and not a !
 =Multiple correct answers can be selected at the same time
 !Questions can have as many questions as you want
 =Questions end with a semi colon character;
 ```
+
+More advanced syntax can be observed in [test.oqf](./test.oqf)
 
 ## FAQ
 
@@ -81,5 +82,6 @@ styling, images, grouped cells, and probably more that I'm missing.
 
 - [x] Add a comment field (Could be used for multiple things)
 - [x] Add a time limit field (for compatibility with Kahoot)
-- [ ] Add a points field (for compatibility with Google Forms)
+- [x] Add a points field (for compatibility with Google Forms)
 - [x] Add a signifier for optional questions (for compatibility with Google Forms)
+- [ ] Write a parser in Go

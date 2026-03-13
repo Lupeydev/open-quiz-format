@@ -17,9 +17,6 @@
             title: "",
             choices: (),
             answers: (),
-            comment: "",
-            time: -1,
-            required: true,
           )
         )
         q+=1
@@ -42,6 +39,8 @@
           data.at(0).answers.insert(a, false)
           flag = "QN"
         } else if chr == bytes("#").at(0){
+
+          data.at(0).comment = ""
           flag = "QK"
         } else if chr == bytes(";").at(0) {
           a = 0
@@ -51,6 +50,8 @@
           data.at(0).required = false
         } else if chr == bytes("\"").at(0) {
           flag = "QT"
+        } else if chr == bytes("/").at(0) {
+          flag = "QP"
         } 
       } else if flag.at(1) == "N" {
         if chr == 0x0A {
@@ -71,6 +72,14 @@
       } else if flag.at(1) == "T" {
         if chr == 0x0A {
           data.at(0).time = int(t)
+          flag = "QD"
+          t = ""
+        } else {
+          t += str.from-unicode(chr)
+        }
+      } else if flag.at(1) == "P" {
+        if chr == 0x0A {
+          data.at(0).points = int(t)
           flag = "QD"
           t = ""
         } else {
