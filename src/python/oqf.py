@@ -1,4 +1,5 @@
 import os
+from unittest import case
 
 class Question:
     def __init__(self, title="", choices=None, answers=None, points=0, comment="", time=0):
@@ -28,9 +29,15 @@ def parse(raw):
                 q.Choices.append(line[1:].strip())
                 q.Answers.append(False)
             case '"':
-                q.Time = int(line[1:]) if line[1:].isdigit() else 0
-            case "/":
-                q.Points = int(line[1:]) if line[1:].isdigit() else 0
+                try:
+                    q.Time = int(line[1:])
+                except ValueError:
+                    q.Time = 0
+            case '/':
+                try:
+                    q.Points = int(line[1:])
+                except ValueError:
+                    q.Points = 0
             case "#":
                 q.Comment = line[1:].strip()
             case "?":
