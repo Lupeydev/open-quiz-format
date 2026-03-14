@@ -20,9 +20,9 @@
           pkgs = import nixpkgs { system = "${system}"; };
         in
         {
-          default = self.packages.${system}.oqf.nightly;
+          default = self.packages.${system}.oqf.go;
           oqf = {
-            nightly = pkgs.callPackage ./default.nix { };
+            go = pkgs.callPackage ./src/go/default.nix { };
           };
         }
       );
@@ -32,7 +32,9 @@
           pkgs = import nixpkgs { system = "${system}"; };
         in
         {
-          default = pkgs.mkShellNoCC { packages = with pkgs; [ ]; };
+          default = pkgs.mkShellNoCC { packages = with pkgs; [
+            go
+          ]; };
         }
       );
     };
