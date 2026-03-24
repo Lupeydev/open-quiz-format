@@ -6,6 +6,18 @@ import (
 	"strconv"
 )
 
+type Flag int
+
+const (
+	None Flag = iota
+	Title
+	QuestionDormant
+	QuestionName
+	Comment
+	Time
+	Points
+)
+
 type Question struct {
 	Title    string
 	Choices  []string
@@ -25,91 +37,88 @@ func Parse(raw []byte) []Question {
 	q := -1
 	a := 0
 	t := ""
-	flag := ""
+	flag := None
 	for _, chr := range raw {
-		if len(flag) == 0 {
+		if flag == None {
 			if chr == ':' {
 				data = append(data, DefaultQuestion)
 				q += 1
-				flag = "T"
+				flag = Title
 				continue
 			}
 			continue
 		}
-		switch flag[0] {
-		case 'T':
+		switch flag {
+		case Title:
 			if chr != 0x0A {
 				data[q].Title += string(chr)
 			} else {
-				flag = "QD"
+				flag = QuestionDormant
 			}
-		case 'Q':
-			switch flag[1] {
-			case 'D':
-				switch chr {
-				case '=':
-					data[q].Choices = append(data[q].Choices, "")
-					data[q].Answers = append(data[q].Answers, true)
-					flag = "QN"
-				case '!':
-					data[q].Choices = append(data[q].Choices, "")
-					data[q].Answers = append(data[q].Answers, false)
-					flag = "QN"
-				case '#':
-					data[q].Comment = ""
-					flag = "QK"
-				case ';':
-					a = 0
-					q += 1
-					flag = ""
-				case '?':
-					data[q].Required = false
-				case '"':
-					flag = "QT"
-				case '/':
-					flag = "QP"
+		case QuestionDormant:
+			switch chr {
+			case '=':
+				data[q].Choices = append(data[q].Choices, "")
+				data[q].Answers = append(data[q].Answers, true)
+				flag = QuestionName
+			case '!':
+				data[q].Choices = append(data[q].Choices, "")
+				data[q].Answers = append(data[q].Answers, false)
+				flag = QuestionName
+			case '#':
+				data[q].Comment = ""
+				flag = Comment
+			case ';':
+				a = 0
+				q += 1
+				flag = None
+			case '?':
+				data[q].Required = false
+			case '"':
+				flag = Time
+			case '/':
+				flag = Points
+			}
+		case QuestionName:
+			switch chr {
+			case 0x0A:
+				a += 1
+				flag = QuestionDormant
+			case ';':
+				a = 0
+				flag = None
+			default:
+				data[q].Choices[a] += string(chr)
+			}
+		case Comment:
+			if chr == 0x0A {
+				flag = QuestionDormant
+			} else {
+				data[q].Comment += string(chr)
+			}
+		case Time:
+			if chr == 0x0A {
+				time, err := strconv.Atoi(t)
+				if err != nil {
+					time = 0
 				}
-			case 'N':
-				switch chr {
-				case 0x0A:
-					a += 1
-					flag = "QD"
-				case ';':
-					a = 0
-					flag = ""
-				default:
-					data[q].Choices[a] += string(chr)
+				data[q].Time = time
+				flag = QuestionDormant
+				t = ""
+			} else {
+				t += string(chr)
+			}
+		case 'P':
+			if chr == 0x0A {
+				pts, err := strconv.Atoi(t)
+				if err != nil {
+					pts = 0
 				}
-			case 'K':
-				if chr == 0x0A {
-					flag = "QD"
-				} else {
-					data[q].Comment += string(chr)
-				}
-			case 'T':
-				if chr == 0x0A {
-					time, err := strconv.Atoi(t)
-					if err != nil {
-						time = 0
-					}
-					data[q].Time = time
-					flag = "QD"
-					t = ""
-				} else {
-					t += string(chr)
-				}
-			case 'P':
-				if chr == 0x0A {
-					pts, err := strconv.Atoi(t)
-					if err != nil {
-						pts = 0
-					}
-					data[q].Points = pts
-					flag = "QD"
-					t = ""
-				} else {
-					t += string(chr)
-				}
+				data[q].Points = pts
+				flag = QuestionDormant
+				t = ""
+			} else {
+				t += string(chr)
 			}
 		}
 	}

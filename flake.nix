@@ -32,6 +32,9 @@
         {
           default = pkgs.mkShellNoCC { packages = with pkgs; [
             go
+            python315
+            uv
+            cargo
           ]; };
         }
       );
