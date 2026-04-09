@@ -11,7 +11,6 @@ class Program
 
         foreach (var file in files)
         {
-            // Note: Updated to call QuizCompile.QuizFe
             var questions = QuizCompile.QuizFe(file);
             foreach (var q in questions)
             {
@@ -43,17 +42,14 @@ public static class QuizCompile
         var questions = new List<Question>();
         Question currentQ = null;
 
-        // Added "\n" to the split array to handle Unix-style line endings
         string[] lines = raw.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
 
         foreach (var rawLine in lines)
         {
-            // FIX: .Trim() must be capitalized
             string line = rawLine.Trim();
             if (string.IsNullOrEmpty(line)) continue;
 
             char identifier = line[0];
-            // FIX: .Substring() must be capitalized (lowercase 's' in 'string')
             string content = line.Substring(1).Trim();
 
             switch (identifier)
